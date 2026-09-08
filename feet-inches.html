@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Feet & Inches Calculator</title>
+<style>
+  :root {
+    color-scheme: light;
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+    --bg: #eef1f4;
+    --panel: #ffffff;
+    --panel-soft: #f7f8fa;
+    --field: #ffffff;
+    --border: #d2d7de;
+    --border-strong: #b8c0ca;
+    --text: #20252b;
+    --muted: #626b76;
+    --muted-2: #7b8490;
+    --accent: #3d6784;
+    --accent-soft: #e9f1f6;
+    --button: #425f73;
+    --button-hover: #344d5e;
+    --secondary: #f2f4f6;
+    --secondary-hover: #e7eaee;
+    --danger: #b42318;
+    --result-bg: #edf6ef;
+    --result-border: #b9d7bf;
+    --result-text: #245b31;
+    --shadow: rgba(37, 45, 55, .10);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 22px;
+    color: var(--text);
+    background:
+      radial-gradient(circle at top left, rgba(85, 112, 132, .08), transparent 30rem),
+      linear-gradient(180deg, #f6f7f8 0%, var(--bg) 100%);
+  }
+  .page { width: min(1320px, 100%); margin: 0 auto; }
+  .topbar {
+    margin-bottom: 18px;
+    padding: 18px 20px;
+    background: rgba(255, 255, 255, .95);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 10px 28px var(--shadow);
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .title-wrap { min-width: 0; }
+  h1 { margin: 0 0 6px; font-size: clamp(22px, 3vw, 31px); letter-spacing: .005em; }
+  .topbar p { margin: 0; color: var(--muted); line-height: 1.45; font-size: 14px; }
+  .count-control { width: min(220px, 100%); flex: 0 0 auto; }
+  .count-control label { margin-bottom: 6px; }
+  .grid { display: grid; gap: 18px; }
+  body.calc-count-1 .grid { grid-template-columns: minmax(0, 1fr); }
+  body.calc-count-2 .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.calc-count-3 .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .calculator {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px var(--shadow);
+  }
+  .calculator.hidden { display: none; }
+  .calc-header { padding: 14px 17px; background: linear-gradient(180deg, #f8fafb, #eef1f4); border-bottom: 1px solid var(--border); }
+  .calc-header h2 { margin: 0; font-size: 18px; }
+  .calc-header p { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+  .content { padding: 17px; display: grid; gap: 13px; }
+  .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+  .measurement, .result, .controls-box { border: 1px solid var(--border); background: var(--panel-soft); border-radius: 12px; padding: 12px; }
+  .measurement h3, .result h3 { margin: 0 0 9px; font-size: 14px; color: var(--accent); }
+  label { display: block; margin: 0 0 5px; color: var(--muted); font-size: 12px; font-weight: 700; }
+  input, select { width: 100%; border: 1px solid var(--border-strong); border-radius: 9px; background: var(--field); color: var(--text); padding: 10px; font-size: 15px; }
+  input::placeholder { color: #929aa4; }
+  input:focus, select:focus { outline: 3px solid rgba(61, 103, 132, .13); border-color: #6d96b1; }
+  .field-stack { display: grid; gap: 9px; }
+  .hint { color: var(--muted-2); font-size: 11px; line-height: 1.35; margin-top: 6px; }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  button { border: 1px solid var(--button); border-radius: 9px; padding: 10px; font-size: 14px; font-weight: 800; color: #ffffff; background: var(--button); cursor: pointer; }
+  button:hover { background: var(--button-hover); }
+  button.secondary { background: var(--secondary); border-color: var(--border-strong); color: var(--text); }
+  button.secondary:hover { background: var(--secondary-hover); }
+  .result { background: var(--result-bg); border-color: var(--result-border); }
+  .result h3 { color: #45664d; }
+  .big { margin: 2px 0 7px; font-size: clamp(25px, 4vw, 34px); font-weight: 900; letter-spacing: .005em; color: var(--result-text); }
+  .small { color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .error { color: var(--danger); font-size: 19px; }
+  .quick-note { margin: 15px 2px 0; color: var(--muted-2); font-size: 12px; line-height: 1.45; }
+  @media (max-width: 1120px) { body.calc-count-3 .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 850px) {
+    body.calc-count-1 .grid, body.calc-count-2 .grid, body.calc-count-3 .grid { grid-template-columns: 1fr; }
+    .topbar { align-items: stretch; flex-direction: column; }
+    .count-control { width: 100%; }
+  }
+  @media (max-width: 560px) { body { padding: 12px; } .two-col, .buttons { grid-template-columns: 1fr; } .content { padding: 14px; } }
+</style>
+</head>
+<body class="calc-count-2">
+  <main class="page">
+    <section class="topbar">
+      <div class="title-wrap">
+        <h1>Feet & Inches Calculator</h1>
+        <p>Use up to three independent calculators for conversions and basic feet/inches math.</p>
+      </div>
+      <div class="count-control">
+        <label for="calcCount">Calculators shown</label>
+        <select id="calcCount">
+          <option value="1">1 calculator</option>
+          <option value="2" selected>2 calculators</option>
+          <option value="3">3 calculators</option>
+        </select>
+      </div>
+    </section>
+    <section class="grid" id="calculatorGrid"></section>
+    <p class="quick-note">Accepted inch formats: decimals, fractions like 1/2, mixed values like 5 3/8, or 5+3/8.</p>
+  </main>
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+  function calcMarkup(n) {
+    return `<article class="calculator" data-calc="${n}" id="calculator${n}"><div class="calc-header"><h2>Calculator ${n}</h2><p>Independent feet and inches calculation</p></div><div class="content"><div class="two-col"><section class="measurement"><h3>Measurement A</h3><div class="field-stack"><div><label for="feetA${n}">Feet</label><input id="feetA${n}" inputmode="decimal" placeholder="Example: 12" value="0" /></div><div><label for="inchA${n}">Inches</label><input id="inchA${n}" placeholder="Example: 6, 1/2, 5+3/8" value="0" /></div></div></section><section class="measurement"><h3>Measurement B / Factor</h3><div class="field-stack"><div><label for="feetB${n}">Feet</label><input id="feetB${n}" inputmode="decimal" placeholder="Example: 4" value="0" /></div><div><label for="inchB${n}">Inches / Factor</label><input id="inchB${n}" placeholder="Example: 3, 1/4, 2" value="0" /></div></div></section></div><section class="controls-box"><div class="two-col"><div><label for="op${n}">Operation</label><select id="op${n}"><option value="convert">Convert A only</option><option value="add">A + B</option><option value="subtract">A - B</option><option value="multiply">A × factor</option><option value="divide">A ÷ factor</option></select><div class="hint">For multiply/divide, the B inches/factor field is used as the factor.</div></div><div><label for="precision${n}">Round inches to nearest</label><select id="precision${n}"><option value="2">1/2&quot;</option><option value="4">1/4&quot;</option><option value="8">1/8&quot;</option><option value="16" selected>1/16&quot;</option><option value="32">1/32&quot;</option><option value="64">1/64&quot;</option></select></div></div></section><div class="buttons"><button id="calc${n}">Calculate</button><button class="secondary" id="clear${n}">Clear</button></div><section class="result" aria-live="polite"><h3>Result</h3><div id="mainResult${n}" class="big">0 ft 0 in</div><div id="details${n}" class="small">Decimal feet: 0<br>Total inches: 0</div></section></div></article>`;
+  }
+  $('calculatorGrid').innerHTML = [1,2,3].map(calcMarkup).join('');
+  function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ const t=b; b=a%b; a=t; } return a||1; }
+  function cleanNumberText(text){ return String(text||'0').trim().replace(/−/g,'-').replace(/"/g,'').replace(/inches|inch|in\.?/gi,'').replace(/feet|foot|ft\.?/gi,'').trim(); }
+  function parseNumber(text){
+    text=cleanNumberText(text); if(text==='') return 0; text=text.replace(/\s+\+/g,'+').replace(/\+\s+/g,'+');
+    const mixed=text.match(/^([+-]?\d+(?:\.\d+)?)\s+(\d+)\s*\/\s*(\d+)$/); if(mixed){ const whole=parseFloat(mixed[1]),num=parseFloat(mixed[2]),den=parseFloat(mixed[3]); if(!den) throw new Error('Invalid fraction.'); return whole<0?whole-num/den:whole+num/den; }
+    const plusMixed=text.match(/^([+-]?\d+(?:\.\d+)?)\s*\+\s*(\d+)\s*\/\s*(\d+)$/); if(plusMixed){ const whole=parseFloat(plusMixed[1]),num=parseFloat(plusMixed[2]),den=parseFloat(plusMixed[3]); if(!den) throw new Error('Invalid fraction.'); return whole<0?whole-num/den:whole+num/den; }
+    const frac=text.match(/^([+-]?\d+)\s*\/\s*(\d+)$/); if(frac){ const den=parseFloat(frac[2]); if(!den) throw new Error('Invalid fraction.'); return parseFloat(frac[1])/den; }
+    const value=Number(text); if(!Number.isFinite(value)) throw new Error('Invalid number: '+text); return value;
+  }
+  function getMeasurement(calcNum,which){ const feet=parseNumber($('feet'+which+calcNum).value); const inches=parseNumber($('inch'+which+calcNum).value); return feet*12+inches; }
+  function trimNumber(num){ if(Math.abs(num)<0.0000005) num=0; return num.toFixed(6).replace(/0+$/,'').replace(/\.$/,''); }
+  function formatFraction(value,denom){ let whole=Math.floor(value),numerator=Math.round((value-whole)*denom); if(numerator===denom){ whole+=1; numerator=0; } if(numerator===0) return String(whole); const divisor=gcd(numerator,denom); numerator/=divisor; denom/=divisor; if(whole===0) return numerator+'/'+denom; return whole+' '+numerator+'/'+denom; }
+  function formatFeetInches(totalInches,precision){ const sign=totalInches<0?'-':''; let abs=Math.abs(totalInches); abs=Math.round(abs*precision)/precision; let feet=Math.floor(abs/12); let rem=abs-feet*12; rem=Math.round(rem*precision)/precision; if(rem>=12){ feet+=1; rem-=12; } return `${sign}${feet} ft ${formatFraction(rem,precision)} in`; }
+  function calculate(calcNum){ try { const a=getMeasurement(calcNum,'A'), b=getMeasurement(calcNum,'B'), factor=parseNumber($('inchB'+calcNum).value), op=$('op'+calcNum).value; let result; if(op==='convert') result=a; if(op==='add') result=a+b; if(op==='subtract') result=a-b; if(op==='multiply') result=a*factor; if(op==='divide'){ if(factor===0) throw new Error('Cannot divide by zero.'); result=a/factor; } const precision=parseInt($('precision'+calcNum).value,10); $('mainResult'+calcNum).className='big'; $('mainResult'+calcNum).textContent=formatFeetInches(result,precision); $('details'+calcNum).innerHTML=`Decimal feet: ${trimNumber(result/12)}<br>Total inches: ${trimNumber(result)}`; } catch(err){ $('mainResult'+calcNum).className='big error'; $('mainResult'+calcNum).textContent=err.message; $('details'+calcNum).textContent='Use numbers, decimals, fractions like 1/2, or mixed values like 5+3/8.'; } }
+  function clearCalc(calcNum){ ['feetA','inchA','feetB','inchB'].forEach(id=>$(id+calcNum).value='0'); $('op'+calcNum).value='convert'; $('precision'+calcNum).value='16'; calculate(calcNum); }
+  function bind(calcNum){ const ids=['feetA','inchA','feetB','inchB','op','precision'].map(id=>id+calcNum); $('calc'+calcNum).addEventListener('click',()=>calculate(calcNum)); $('clear'+calcNum).addEventListener('click',()=>clearCalc(calcNum)); ids.forEach(id=>{ $(id).addEventListener('input',()=>calculate(calcNum)); $(id).addEventListener('change',()=>calculate(calcNum)); }); calculate(calcNum); }
+  function setCalculatorCount(count){ count=Math.max(1,Math.min(3,Number(count)||2)); document.body.classList.remove('calc-count-1','calc-count-2','calc-count-3'); document.body.classList.add('calc-count-'+count); for(let i=1;i<=3;i++) $('calculator'+i).classList.toggle('hidden',i>count); $('calcCount').value=String(count); try{ localStorage.setItem('feet-inches-calculator-count',String(count)); }catch(e){} }
+  [1,2,3].forEach(bind); let savedCount=2; try{ savedCount=Number(localStorage.getItem('feet-inches-calculator-count'))||2; }catch(e){} setCalculatorCount(savedCount); $('calcCount').addEventListener('change',e=>setCalculatorCount(e.target.value));
+})();
+</script>
+</body>
+</html>
