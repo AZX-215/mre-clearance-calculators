@@ -1,6 +1,6 @@
 # MRE Clearance Calculators
 
-Offline/online browser-based utility design calculators. The repository includes the Delta Clearance Calculator in three themes, a UGI Sag / Resag Calculator, and a Feet & Inches Calculator.
+Offline/online browser-based utility design calculators. The repository includes the Delta Clearance Calculator in three themes, a UGI Sag & Pole Depth Calculator, and a Feet & Inches Calculator.
 
 ## Open the calculators online
 
@@ -18,11 +18,11 @@ Available themes:
 - Grey: `grey.html`
 - Light: `light.html`
 
-### UGI Sag / Resag Calculator
+### UGI Sag & Pole Depth Calculator
 
 - `ugi-resag.html`
 
-Select a conductor and actual span, enter the secondary attachment height at each pole, and calculate the maximum resag attachment height. Sag is interpolated between surrounding chart values and rounded to the nearest whole inch.
+Calculate resag height from the UGI sag chart and pole height above ground from the UGI pole-depth chart.
 
 ### Feet & Inches Calculator
 
@@ -74,11 +74,12 @@ Opening an HTML file directly from the Google Drive website may show a preview o
 - Triplex and bare-wire conductor selections
 - Actual-span interpolation between surrounding chart values
 - Sag rounded to the nearest whole inch
-- Pole 1 and Pole 2 secondary attachment height inputs
-- Automatic identification of the lower controlling attachment
 - Maximum resag attachment height calculation
-- Full UGI sag chart reference table
-- No extrapolation beyond the listed span range
+- UGI sag chart reference
+- Pole length and ground-type selection
+- Required setting depth
+- Pole height above ground
+- UGI pole-depth chart reference
 
 ## Feet & Inches calculator features
 
