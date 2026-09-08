@@ -1,20 +1,22 @@
-# Delta Clearance Calculator
+# Utility Clearance & Sag Calculators
 
-Offline/online delta clearance calculator with blue, grey, and light themes, built for quick ruling-span and actual-span clearance checks.
+Offline/online utility design calculators hosted as static HTML pages. The repository currently includes the Delta Clearance Calculator in three themes and a UGI Sag / Resag Calculator.
 
-## Open the calculator online
+## Open the calculators online
 
-After this repository is published with GitHub Pages, open the main site link:
+Main GitHub Pages site:
 
 ```text
 https://AZX-215.github.io/delta-clearance-calculator/
 ```
 
-The main page lets you choose one of three versions:
+### Delta Clearance Calculator
 
-- Blue theme: `blue.html`
-- Grey theme: `grey.html`
-- Light theme: `light.html`
+Available themes:
+
+- Blue: `blue.html`
+- Grey: `grey.html`
+- Light: `light.html`
 
 Direct links:
 
@@ -24,27 +26,36 @@ https://AZX-215.github.io/delta-clearance-calculator/grey.html
 https://AZX-215.github.io/delta-clearance-calculator/light.html
 ```
 
-## Open the calculator offline
+### UGI Sag / Resag Calculator
 
-Download or clone the repository to your computer, then open `index.html` in your browser.
+Direct link:
 
-You can also open any theme directly:
+```text
+https://AZX-215.github.io/delta-clearance-calculator/ugi-resag.html
+```
+
+The UGI calculator lets you select a conductor and actual span, enter the secondary attachment height at each pole, and calculate the maximum resag attachment height using the corresponding chart measurement. It only calculates when the exact span exists in the supplied chart and does not interpolate unlisted spans.
+
+## Use the calculators offline
+
+Download or clone the repository, then open `index.html` in a browser.
+
+You can also open any calculator directly:
 
 - `blue.html`
 - `grey.html`
 - `light.html`
+- `ugi-resag.html`
 
-No internet connection is required once the files are on your computer. The calculator is built into the HTML files and does not depend on outside websites, scripts, or services.
+No internet connection is required after the files are stored on your computer. The calculators are self-contained HTML, CSS, and JavaScript files and do not depend on external scripts or services.
 
 ## Google Drive / OneDrive use
 
-You can keep the repository folder in Google Drive for Desktop, OneDrive, Dropbox, or another synced folder. Open the files from File Explorer so they run locally in your browser.
+You can keep the repository folder in Google Drive for Desktop, OneDrive, Dropbox, or another synced folder. Open the HTML files from File Explorer so they run locally in your browser.
 
-Opening the files from the Google Drive website may show a preview or download prompt instead of running the calculator as a normal webpage. For a real online webpage, use GitHub Pages.
+Opening an HTML file directly from the Google Drive website may show a preview or download prompt instead of running it as a normal webpage. Use GitHub Pages for browser-based online access.
 
-## Features
-
-Each theme has the same calculator functions:
+## Delta calculator features
 
 - 1, 2, or 3 calculators visible at once
 - Ruling span helper
@@ -52,13 +63,26 @@ Each theme has the same calculator functions:
 - Actual span input
 - Ruling span table selection
 - Calculated raw clearance
-- Minimum-applied value when the result is below 5 ft 0 in
-- Suggested rounded-up comm-primary distance, rounded up to the next whole inch
-- Warning messages when a value is outside the selected table range
-- Local browser saving for recent inputs/settings
+- 5 ft 0 in minimum when applicable
+- Suggested comm-primary distance rounded up to the next whole inch
+- Warnings when a value is outside the selected table range
+- Local browser saving for recent inputs and settings
+
+## UGI calculator features
+
+- Triplex and bare-wire conductor selections
+- Exact actual-span lookup
+- Pole 1 and Pole 2 secondary attachment height inputs
+- Automatic identification of the lower controlling attachment
+- Chart measurement display
+- Maximum resag attachment height calculation
+- Full UGI sag chart reference table
+- Clear warning when no exact chart value is available
+- No interpolation or estimated sag values for unlisted spans
 
 ## Notes
 
-- The suggested distance is rounded up to the next whole inch after any 5 ft 0 in minimum is applied.
-- Treat warnings or extrapolated values as check items and verify before final design use.
-- The calculator runs entirely in the browser. No data is sent anywhere.
+- The Delta suggested distance is rounded up to the next whole inch after any 5 ft 0 in minimum is applied.
+- Treat Delta warnings or extrapolated values as check items and verify before final design use.
+- The UGI calculator reproduces the supplied chart values and intentionally does not invent values for unlisted spans.
+- All calculations run entirely in the browser. No entered data is sent anywhere.
