@@ -22,7 +22,7 @@ Available themes:
 
 - `ugi-resag.html`
 
-Select a conductor and actual span, enter the secondary attachment height at each pole, and calculate the maximum resag attachment height using the corresponding chart measurement. The calculator only calculates when the exact span exists in the supplied chart and does not interpolate unlisted spans.
+Select a conductor and actual span, enter the secondary attachment height at each pole, and calculate the maximum resag attachment height. Sag is interpolated between surrounding chart values and rounded to the nearest whole inch.
 
 ### Feet & Inches Calculator
 
@@ -72,14 +72,13 @@ Opening an HTML file directly from the Google Drive website may show a preview o
 ## UGI calculator features
 
 - Triplex and bare-wire conductor selections
-- Exact actual-span lookup
+- Actual-span interpolation between surrounding chart values
+- Sag rounded to the nearest whole inch
 - Pole 1 and Pole 2 secondary attachment height inputs
 - Automatic identification of the lower controlling attachment
-- Chart measurement display
 - Maximum resag attachment height calculation
 - Full UGI sag chart reference table
-- Clear warning when no exact chart value is available
-- No interpolation or estimated sag values for unlisted spans
+- No extrapolation beyond the listed span range
 
 ## Feet & Inches calculator features
 
@@ -96,5 +95,4 @@ Opening an HTML file directly from the Google Drive website may show a preview o
 
 - The Delta suggested distance is rounded up to the next whole inch after any 5 ft 0 in minimum is applied.
 - Treat Delta warnings or extrapolated values as check items and verify before final design use.
-- The UGI calculator reproduces the supplied chart values and intentionally does not invent values for unlisted spans.
 - All calculations run entirely in the browser. No entered data is sent anywhere.
