@@ -1,22 +1,14 @@
 # MRE Clearance Calculators
 
-Offline/online browser-based utility design calculators. The repository currently includes the Delta Clearance Calculator in three themes, a UGI Sag / Resag Calculator, and a Feet & Inches Calculator.
+Offline/online browser-based utility design calculators. The repository includes the Delta Clearance Calculator in three themes, a UGI Sag / Resag Calculator, and a Feet & Inches Calculator.
 
 ## Open the calculators online
 
-Current GitHub Pages site:
-
-```text
-https://AZX-215.github.io/delta-clearance-calculator/
-```
-
-After the repository is renamed to `mre-clearance-calculators`, the expected Pages URL will be:
+GitHub Pages site:
 
 ```text
 https://AZX-215.github.io/mre-clearance-calculators/
 ```
-
-The landing page uses relative links, so the calculator buttons will continue to work after the repository rename.
 
 ### Delta Clearance Calculator
 
