@@ -1,14 +1,22 @@
-# Utility Clearance & Sag Calculators
+# MRE Clearance Calculators
 
-Offline/online utility design calculators hosted as static HTML pages. The repository currently includes the Delta Clearance Calculator in three themes and a UGI Sag / Resag Calculator.
+Offline/online browser-based utility design calculators. The repository currently includes the Delta Clearance Calculator in three themes, a UGI Sag / Resag Calculator, and a Feet & Inches Calculator.
 
 ## Open the calculators online
 
-Main GitHub Pages site:
+Current GitHub Pages site:
 
 ```text
 https://AZX-215.github.io/delta-clearance-calculator/
 ```
+
+After the repository is renamed to `mre-clearance-calculators`, the expected Pages URL will be:
+
+```text
+https://AZX-215.github.io/mre-clearance-calculators/
+```
+
+The landing page uses relative links, so the calculator buttons will continue to work after the repository rename.
 
 ### Delta Clearance Calculator
 
@@ -18,23 +26,23 @@ Available themes:
 - Grey: `grey.html`
 - Light: `light.html`
 
-Direct links:
-
-```text
-https://AZX-215.github.io/delta-clearance-calculator/blue.html
-https://AZX-215.github.io/delta-clearance-calculator/grey.html
-https://AZX-215.github.io/delta-clearance-calculator/light.html
-```
-
 ### UGI Sag / Resag Calculator
 
-Direct link:
+- `ugi-resag.html`
 
-```text
-https://AZX-215.github.io/delta-clearance-calculator/ugi-resag.html
-```
+Select a conductor and actual span, enter the secondary attachment height at each pole, and calculate the maximum resag attachment height using the corresponding chart measurement. The calculator only calculates when the exact span exists in the supplied chart and does not interpolate unlisted spans.
 
-The UGI calculator lets you select a conductor and actual span, enter the secondary attachment height at each pole, and calculate the maximum resag attachment height using the corresponding chart measurement. It only calculates when the exact span exists in the supplied chart and does not interpolate unlisted spans.
+### Feet & Inches Calculator
+
+- `feet-inches.html`
+
+Use 1, 2, or 3 independent calculators for:
+
+- Feet/inches conversion
+- Addition and subtraction
+- Multiplication and division by a factor
+- Fractional-inch input
+- Configurable rounding from 1/2 in through 1/64 in
 
 ## Use the calculators offline
 
@@ -46,6 +54,7 @@ You can also open any calculator directly:
 - `grey.html`
 - `light.html`
 - `ugi-resag.html`
+- `feet-inches.html`
 
 No internet connection is required after the files are stored on your computer. The calculators are self-contained HTML, CSS, and JavaScript files and do not depend on external scripts or services.
 
@@ -79,6 +88,17 @@ Opening an HTML file directly from the Google Drive website may show a preview o
 - Full UGI sag chart reference table
 - Clear warning when no exact chart value is available
 - No interpolation or estimated sag values for unlisted spans
+
+## Feet & Inches calculator features
+
+- 1, 2, or 3 calculators visible at once
+- Independent inputs and results for each calculator
+- Feet/inches conversion
+- Add and subtract measurements
+- Multiply or divide by a factor
+- Decimal, fractional, and mixed-fraction inch input
+- Rounding to 1/2, 1/4, 1/8, 1/16, 1/32, or 1/64 inch
+- Local saving of the selected calculator count
 
 ## Notes
 
