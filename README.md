@@ -73,6 +73,7 @@ Opening an HTML file directly from the Google Drive website may show a preview o
 
 - Triplex and bare-wire conductor selections
 - Actual-span interpolation between surrounding chart values
+- Estimated sag for red over-limit spans through 290 ft
 - Sag rounded to the nearest whole inch
 - Maximum resag attachment height calculation
 - UGI sag chart reference
@@ -96,4 +97,5 @@ Opening an HTML file directly from the Google Drive website may show a preview o
 
 - The Delta suggested distance is rounded up to the next whole inch after any 5 ft 0 in minimum is applied.
 - Treat Delta warnings or extrapolated values as check items and verify before final design use.
+- Red UGI sag values are calculated estimates beyond the acceptable span length, not listed UGI chart values.
 - All calculations run entirely in the browser. No entered data is sent anywhere.
