@@ -76,6 +76,7 @@ Opening an HTML file directly from the Google Drive website may show a preview o
 - Estimated sag for red over-limit spans through 290 ft
 - Sag rounded to the nearest whole inch
 - Maximum resag attachment height calculation
+- Supports one or both pole attachment heights
 - UGI sag chart reference
 - Pole length and ground-type selection
 - Required setting depth
