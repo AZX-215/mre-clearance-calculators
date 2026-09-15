@@ -28,13 +28,13 @@ Calculate resag height from the UGI sag chart and pole height above ground from 
 
 - `feet-inches.html`
 
-Use 1, 2, or 3 independent calculators for:
+Use up to 8 calculators for:
 
-- Feet/inches conversion
+- Decimal feet/inches conversion
 - Addition and subtraction
 - Multiplication and division by a factor
-- Fractional-inch input
-- Configurable rounding from 1/2 in through 1/64 in
+- Linking one calculator result into another calculator
+- Locking a result so it can be reused while inputs continue changing
 
 ## Use the calculators offline
 
@@ -48,7 +48,7 @@ You can also open any calculator directly:
 - `ugi-resag.html`
 - `feet-inches.html`
 
-No internet connection is required after the files are stored on your computer. The calculators are self-contained HTML, CSS, and JavaScript files and do not depend on external scripts or services.
+No internet connection is required after the repository files are stored on your computer. The calculators use only local HTML, CSS, and JavaScript and do not depend on external scripts or services.
 
 ## Google Drive / OneDrive use
 
@@ -85,14 +85,18 @@ Opening an HTML file directly from the Google Drive website may show a preview o
 
 ## Feet & Inches calculator features
 
-- 1, 2, or 3 calculators visible at once
-- Independent inputs and results for each calculator
+- 1 through 8 calculators visible at once
+- Responsive calculator cards that reflow with the available screen width
+- Decimal feet and inches input
 - Feet/inches conversion
 - Add and subtract measurements
-- Multiply or divide by a factor
-- Decimal, fractional, and mixed-fraction inch input
-- Rounding to 1/2, 1/4, 1/8, 1/16, 1/32, or 1/64 inch
-- Local saving of the selected calculator count
+- Multiply or divide by a decimal factor
+- Use another calculator's result as Measurement A or Measurement B
+- Use a linked result's decimal-feet value as the factor for multiply/divide
+- Lock a result to freeze it for reuse by other calculators
+- Circular-reference prevention for linked calculators
+- Clear one calculator or clear all calculators
+- Local browser saving for calculator count, values, operations, links, and locked results
 
 ## Notes
 
