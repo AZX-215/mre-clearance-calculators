@@ -6,6 +6,8 @@ Add `mon-power-midspan.html` as a separate calculator linked from the landing pa
 
 Export all completed calculations to a downloaded Markdown file, including completed hidden cards. Include current inputs, intermediate values, method, and final result. Omit blank/incomplete/invalid results, report skipped populated calculators in the page status, and escape user-entered labels as text. Preserve the original storage key so earlier inputs migrate to 100 slots. Build cards as their count is increased rather than rendering 100 on initial load.
 
+Keep all 1–100 count options in the HTML, independently of JavaScript startup. The stylesheet and both scripts use a common version query; bump it when calculator assets change so cached earlier scripts cannot be combined with a new page.
+
 ## Formula review
 
 Source: supplied Proposed Midspan Calculator template dated 7/23/2026, visible TEMPLATE sheet, D3 and F3 (shared down their columns). The supplied completed workbook has six populated job rows, 4–9, used as regression cases. Do not commit the source workbooks or job identifiers.

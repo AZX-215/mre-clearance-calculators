@@ -120,13 +120,6 @@
     for (const card of grid.children) card.hidden = Number(card.dataset.index) >= state.count;
   }
 
-  for (let n = 1; n <= core.MAX_CALCULATORS; n += 1) {
-    const option = document.createElement('option');
-    option.value = String(n);
-    option.textContent = `${n} calculator${n === 1 ? '' : 's'}`;
-    if (n === 1) count.replaceChildren();
-    count.appendChild(option);
-  }
   showCount();
 
   function onEdit(event) {
