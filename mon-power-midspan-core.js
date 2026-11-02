@@ -5,7 +5,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  const MAX_CALCULATORS = 8;
+  const MAX_CALCULATORS = 100;
   const fields = ['label', 'feetA', 'inchesA', 'feetB', 'inchesB', 'span', 'existingFeet', 'existingInches'];
   const blank = (value) => String(value ?? '').trim() === '';
 
@@ -86,5 +86,48 @@
     return { count, calculators };
   }
 
-  return { MAX_CALCULATORS, calculate, formatHeight, normalizeSavedState };
+  function exportMarkdown(saved) {
+    const normalized = normalizeSavedState(saved);
+    const sections = [];
+    let skippedCount = 0;
+    const escapeText = (text) => String(text).replace(/\s+/g, ' ').trim()
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/[\\`*_[\]|#]/g, '\\$&');
+    const enteredHeight = (feet, inches) => `${Number(feet || 0)}\u2032 ${Number(inches || 0)}\u2033`;
+    normalized.calculators.forEach((values, index) => {
+      let result;
+      try { result = calculate(values); } catch (_) { result = null; }
+      if (!result) {
+        if (fields.some((field) => !blank(values[field]))) skippedCount += 1;
+        return;
+      }
+      const lines = [`## Calculator ${index + 1}`, ''];
+      if (!blank(values.label)) lines.push(`**Span / SCIDs:** ${escapeText(values.label)}`, '');
+      lines.push('| Calculation | Value |', '| --- | --- |');
+      const row = (label, value) => lines.push(`| ${label} | ${value} |`);
+      if (result.method === 'no-comms') {
+        row('Method', 'No existing comms');
+        row('SCID A proposed comm height', enteredHeight(values.feetA, values.inchesA));
+        row('SCID B proposed comm height', enteredHeight(values.feetB, values.inchesB));
+        row('Entered span length', `${Number(values.span)}\u2032`);
+        row('Span used', `${result.spanFeet}\u2032${result.spanRounded ? ' (rounded up)' : ''}`);
+        row('Average attach height', formatHeight(result.averageInches));
+        row('Sag allowance', `${Number(result.sagInches.toFixed(4))}\u2033 (${result.rate * 100}%)`);
+        row('Proposed midspan height after ice load', `**${formatHeight(result.finalInches)}**`);
+        lines.push('', 'Neutral sag and elevation are not included.');
+      } else {
+        row('Method', 'Existing comm below');
+        row('Existing comm midspan height', enteredHeight(values.existingFeet, values.existingInches));
+        row('Offset', '4\u2033');
+        row('Proposed midspan height', `**${formatHeight(result.finalInches)}**`);
+      }
+      sections.push(lines.join('\n'));
+    });
+    return {
+      markdown: sections.length ? `# Mon Power Proposed Midspan Calculations\n\nCompleted calculations: ${sections.length}\n\n${sections.join('\n\n')}\n` : '',
+      completedCount: sections.length, skippedCount,
+    };
+  }
+
+  return { MAX_CALCULATORS, calculate, formatHeight, normalizeSavedState, exportMarkdown };
 });

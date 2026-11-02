@@ -28,7 +28,9 @@ Calculate resag height from the UGI sag chart and pole height above ground from 
 
 - `mon-power-midspan.html`
 
-Light theme with 1–8 independent calculators, optional span labels, clear/copy controls, and local browser saving. For spans with no existing comms, uses the supplied 7/23/2026 template: round the average proposed attachment height to the nearest inch, subtract 0.5% of span length below 300 ft or 1% at/above 300 ft, then round the result to the nearest inch. Fractional span lengths round up before selecting the rate. Neutral sag and elevation are not included.
+Light theme with 1–100 independent calculators, optional span labels, clear/copy controls, and local browser saving. **Export Markdown** downloads all completed calculations, including hidden calculators, as a `.md` file with inputs, intermediate values, and results. Empty calculators are omitted; a download status reports any incomplete or invalid calculators skipped. Existing saved inputs are retained when upgrading from 8 calculators.
+
+For spans with no existing comms, uses the supplied 7/23/2026 template: round the average proposed attachment height to the nearest inch, subtract 0.5% of span length below 300 ft or 1% at/above 300 ft, then round the result to the nearest inch. Fractional span lengths round up before selecting the rate. Neutral sag and elevation are not included.
 
 The separate **Existing comm below** method adds 4 inches to the entered existing comm midspan height, following the template note. This method does not calculate an additional ice-load deduction. See [formula review](docs/mon-power-midspan.md).
 

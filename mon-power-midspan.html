@@ -16,20 +16,15 @@
         <div>
           <label for="calcCount">Calculators shown</label>
           <select id="calcCount">
-            <option value="1">1 calculator</option>
             <option value="2" selected>2 calculators</option>
-            <option value="3">3 calculators</option>
-            <option value="4">4 calculators</option>
-            <option value="5">5 calculators</option>
-            <option value="6">6 calculators</option>
-            <option value="7">7 calculators</option>
-            <option value="8">8 calculators</option>
           </select>
         </div>
+        <button id="exportMarkdown" type="button" title="Export all completed calculations, including hidden calculators">Export Markdown</button>
         <button id="clearAll" type="button">Clear all</button>
       </div>
     </header>
     <p id="storageNotice" class="notice" role="status" hidden></p>
+    <p id="exportStatus" class="export-status" role="status" hidden></p>
     <section id="calculatorGrid" class="grid" aria-label="Proposed midspan calculators"></section>
     <noscript>Enable JavaScript to use the calculator.</noscript>
   </main>

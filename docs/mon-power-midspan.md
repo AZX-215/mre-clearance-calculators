@@ -2,7 +2,9 @@
 
 ## Scope
 
-Add `mon-power-midspan.html` as a separate calculator linked from the landing page, using the existing light colors, local HTML/CSS/JavaScript, 1–8 independent cards (two initially), and local browser saving. No examples or explanatory panels. Preserve the other calculators.
+Add `mon-power-midspan.html` as a separate calculator linked from the landing page, using the existing light colors, local HTML/CSS/JavaScript, 1–100 independent cards (two initially), and local browser saving. No examples or explanatory panels. Preserve the other calculators.
+
+Export all completed calculations to a downloaded Markdown file, including completed hidden cards. Include current inputs, intermediate values, method, and final result. Omit blank/incomplete/invalid results, report skipped populated calculators in the page status, and escape user-entered labels as text. Preserve the original storage key so earlier inputs migrate to 100 slots. Build cards as their count is increased rather than rendering 100 on initial load.
 
 ## Formula review
 
