@@ -1,6 +1,6 @@
 # MRE Clearance Calculators
 
-Offline/online browser-based utility design calculators. The repository includes the Delta Clearance Calculator in three themes, a UGI Sag & Pole Depth Calculator, and a Feet & Inches Calculator.
+Offline/online browser-based utility design calculators. The repository includes the Delta Clearance Calculator in three themes, a UGI Sag & Pole Depth Calculator, a Mon Power Proposed Midspan Calculator, and a Feet & Inches Calculator.
 
 ## Open the calculators online
 
@@ -23,6 +23,14 @@ Available themes:
 - `ugi-resag.html`
 
 Calculate resag height from the UGI sag chart and pole height above ground from the UGI pole-depth chart.
+
+### Mon Power Proposed Midspan Calculator
+
+- `mon-power-midspan.html`
+
+Light theme with 1–8 independent calculators, optional span labels, clear/copy controls, and local browser saving. For spans with no existing comms, uses the supplied 7/23/2026 template: round the average proposed attachment height to the nearest inch, subtract 0.5% of span length below 300 ft or 1% at/above 300 ft, then round the result to the nearest inch. Fractional span lengths round up before selecting the rate. Neutral sag and elevation are not included.
+
+The separate **Existing comm below** method adds 4 inches to the entered existing comm midspan height, following the template note. This method does not calculate an additional ice-load deduction. See [formula review](docs/mon-power-midspan.md).
 
 ### Feet & Inches Calculator
 
@@ -47,6 +55,7 @@ You can also open any calculator directly:
 - `light.html`
 - `ugi-resag.html`
 - `feet-inches.html`
+- `mon-power-midspan.html`
 
 No internet connection is required after the repository files are stored on your computer. The calculators use only local HTML, CSS, and JavaScript and do not depend on external scripts or services.
 
@@ -99,6 +108,8 @@ Opening an HTML file directly from the Google Drive website may show a preview o
 - Local browser saving for calculator count, values, operations, links, and locked results
 
 ## Notes
+
+- Run the calculation regression tests with `node --test tests/*.test.js`.
 
 - The Delta suggested distance is rounded up to the next whole inch after any 5 ft 0 in minimum is applied.
 - Treat Delta warnings or extrapolated values as check items and verify before final design use.

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Mon Power Proposed Midspan Calculator</title>
+  <link rel="stylesheet" href="mon-power-midspan.css" />
+</head>
+<body>
+  <main class="page">
+    <a class="back" href="index.html">All calculators</a>
+    <header class="topbar">
+      <h1>Mon Power Proposed Midspan Calculator</h1>
+      <div class="page-controls">
+        <div>
+          <label for="calcCount">Calculators shown</label>
+          <select id="calcCount">
+            <option value="1">1 calculator</option>
+            <option value="2" selected>2 calculators</option>
+            <option value="3">3 calculators</option>
+            <option value="4">4 calculators</option>
+            <option value="5">5 calculators</option>
+            <option value="6">6 calculators</option>
+            <option value="7">7 calculators</option>
+            <option value="8">8 calculators</option>
+          </select>
+        </div>
+        <button id="clearAll" type="button">Clear all</button>
+      </div>
+    </header>
+    <p id="storageNotice" class="notice" role="status" hidden></p>
+    <section id="calculatorGrid" class="grid" aria-label="Proposed midspan calculators"></section>
+    <noscript>Enable JavaScript to use the calculator.</noscript>
+  </main>
+  <script src="mon-power-midspan-core.js"></script>
+  <script src="mon-power-midspan-app.js"></script>
+</body>
+</html>
