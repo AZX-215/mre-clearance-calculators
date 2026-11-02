@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { calculate, formatHeight, normalizeSavedState } = require('../mon-power-midspan-core.js');
+const { calculate, formatHeight, normalizeSavedState, exportMarkdown } = require('../mon-power-midspan-core.js');
 
 const input = (feetA, inchesA, feetB, inchesB, span) => ({
   method: 'no-comms', feetA, inchesA, feetB, inchesB, span,
@@ -82,15 +82,77 @@ test('formats whole-inch results with a carried foot and no decimal inches', () 
   assert.throws(() => formatHeight(NaN));
 });
 
-test('restores eight independent instances, keeps hidden values, and sanitizes persisted state', () => {
+test('restores 100 independent instances, keeps hidden values, and preserves earlier saved calculators', () => {
   const saved = { count: 1, calculators: [{ feetA: '20', method: 'no-comms' }, { feetA: '30', label: 'span 2' }] };
   const state = normalizeSavedState(saved);
   assert.equal(state.count, 1);
-  assert.equal(state.calculators.length, 8);
+  assert.equal(state.calculators.length, 100);
   assert.equal(state.calculators[1].feetA, '30');
   state.calculators[0].feetA = '21';
   assert.equal(state.calculators[1].feetA, '30');
-  assert.equal(normalizeSavedState({ count: 99 }).count, 2);
+  assert.equal(normalizeSavedState({ count: 100 }).count, 100);
+  assert.equal(normalizeSavedState({ count: 101 }).count, 2);
+  assert.equal(normalizeSavedState({ count: 0 }).count, 2);
   assert.equal(normalizeSavedState({ calculators: [null, { method: 'bad', feetA: {} }] }).calculators[1].method, 'no-comms');
   assert.equal(normalizeSavedState(null).calculators[0].feetA, '');
+});
+
+test('exports completed calculations from all 100 saved instances, including hidden ones', () => {
+  const state = normalizeSavedState(null);
+  state.count = 1;
+  state.calculators[0] = { ...input(19, 10, 19, 2, 402), label: '007 + 006' };
+  state.calculators[99] = { method: 'existing-comms', existingFeet: '18', existingInches: '10' };
+  const result = exportMarkdown(state);
+  assert.equal(result.completedCount, 2);
+  assert.equal(result.skippedCount, 0);
+  assert.match(result.markdown, /## Calculator 1\n/);
+  assert.match(result.markdown, /007 \+ 006/);
+  assert.match(result.markdown, /SCID A proposed comm height \| 19′ 10″/);
+  assert.match(result.markdown, /SCID B proposed comm height \| 19′ 2″/);
+  assert.match(result.markdown, /Average attach height \| 19′ 6″/);
+  assert.match(result.markdown, /Sag allowance \| 48.24″ \(1%\)/);
+  assert.match(result.markdown, /Proposed midspan height after ice load \| \*\*15′ 6″\*\*/);
+  const existingSection = result.markdown.split('## Calculator 100\n')[1];
+  assert.match(existingSection, /Existing comm midspan height \| 18′ 10″/);
+  assert.match(existingSection, /Offset \| 4″/);
+  assert.match(existingSection, /Proposed midspan height \| \*\*19′ 2″\*\*/);
+  assert.doesNotMatch(existingSection, /ice|sag|SCID A/i);
+});
+
+test('export uses current inputs and shows fractional span normalization', () => {
+  const state = normalizeSavedState(null);
+  state.calculators[0] = { ...input(20, 0, 20, 0, '299.1'), finalInches: 999 };
+  let result = exportMarkdown(state);
+  assert.match(result.markdown, /Entered span length \| 299.1′/);
+  assert.match(result.markdown, /Span used \| 300′ \(rounded up\)/);
+  assert.match(result.markdown, /\*\*17′ 0″\*\*/);
+  state.calculators[0].feetB = '22';
+  result = exportMarkdown(state);
+  assert.match(result.markdown, /\*\*18′ 0″\*\*/);
+});
+
+test('export skips empty, incomplete and invalid instances without losing completed results', () => {
+  const state = normalizeSavedState(null);
+  state.calculators[0] = { ...input(20, 0, 20, 0, 100) };
+  state.calculators[1].feetA = '20';
+  state.calculators[2] = input(20, 0, 20, 0, 'bad');
+  state.calculators[3].label = 'Unfilled span';
+  const before = JSON.stringify(state);
+  const result = exportMarkdown(state);
+  assert.equal(result.completedCount, 1);
+  assert.equal(result.skippedCount, 3);
+  assert.match(result.markdown, /## Calculator 1\n/);
+  assert.doesNotMatch(result.markdown, /## Calculator [234]\n/);
+  assert.equal(JSON.stringify(state), before);
+  assert.deepEqual(exportMarkdown(normalizeSavedState(null)), { markdown: '', completedCount: 0, skippedCount: 0 });
+});
+
+test('export treats labels as text, escaping Markdown and HTML', () => {
+  const state = normalizeSavedState(null);
+  state.calculators[0] = { ...input(20, 0, 20, 0, 100), label: '<img src=x>\n# [link](url) | *text*' };
+  const result = exportMarkdown(state);
+  assert.doesNotMatch(result.markdown, /<img|\n# \[link/);
+  assert.match(result.markdown, /&lt;img src=x&gt;/);
+  assert.match(result.markdown, /\\\|/);
+  assert.match(result.markdown, /\\\*text\\\*/);
 });

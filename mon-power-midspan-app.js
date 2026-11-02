@@ -5,6 +5,7 @@
   const grid = document.getElementById('calculatorGrid');
   const count = document.getElementById('calcCount');
   const notice = document.getElementById('storageNotice');
+  const exportStatus = document.getElementById('exportStatus');
   let state;
   try {
     state = core.normalizeSavedState(JSON.parse(localStorage.getItem(STORAGE_KEY)));
@@ -108,16 +109,23 @@
   }
 
   function showCount() {
+    while (grid.children.length < state.count) {
+      const card = buildCard(grid.children.length + 1);
+      grid.appendChild(card);
+      fill(card);
+      update(card);
+    }
     document.body.dataset.count = String(state.count);
     count.value = String(state.count);
     for (const card of grid.children) card.hidden = Number(card.dataset.index) >= state.count;
   }
 
   for (let n = 1; n <= core.MAX_CALCULATORS; n += 1) {
-    const card = buildCard(n);
-    grid.appendChild(card);
-    fill(card);
-    update(card);
+    const option = document.createElement('option');
+    option.value = String(n);
+    option.textContent = `${n} calculator${n === 1 ? '' : 's'}`;
+    if (n === 1) count.replaceChildren();
+    count.appendChild(option);
   }
   showCount();
 
@@ -126,26 +134,54 @@
     if (!control.dataset.field) return;
     const card = control.closest('.calculator');
     state.calculators[Number(card.dataset.index)][control.dataset.field] = control.value;
+    exportStatus.hidden = true;
     update(card);
     save();
   }
   grid.addEventListener('input', onEdit);
   grid.addEventListener('change', onEdit);
   count.addEventListener('change', () => {
-    state.count = Number(count.value);
+    state.count = core.normalizeSavedState({ count: Number(count.value) }).count;
     showCount();
     save();
   });
   document.getElementById('clearAll').addEventListener('click', () => {
+    exportStatus.hidden = true;
     state.calculators = core.normalizeSavedState(null).calculators;
     for (const card of grid.children) { fill(card); update(card); }
     save();
+  });
+  document.getElementById('exportMarkdown').addEventListener('click', () => {
+    const result = core.exportMarkdown(state);
+    exportStatus.hidden = false;
+    if (!result.completedCount) {
+      exportStatus.textContent = 'Complete at least one calculation before exporting.';
+      return;
+    }
+    let url;
+    let link;
+    try {
+      const blob = new Blob([result.markdown], { type: 'text/markdown;charset=utf-8' });
+      url = URL.createObjectURL(blob);
+      link = document.createElement('a');
+      link.href = url;
+      link.download = 'Mon_Power_Proposed_Midspan_Calculations.md';
+      document.body.appendChild(link);
+      link.click();
+      exportStatus.textContent = `Exported ${result.completedCount} calculation${result.completedCount === 1 ? '' : 's'}.${result.skippedCount ? ` Skipped ${result.skippedCount} incomplete or invalid calculator${result.skippedCount === 1 ? '' : 's'}.` : ''}`;
+    } catch (_) {
+      exportStatus.textContent = 'The file could not be downloaded. Please try exporting again.';
+    } finally {
+      if (link) link.remove();
+      if (url) setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
   });
   grid.addEventListener('click', async (event) => {
     const button = event.target.closest('[data-action]');
     if (!button) return;
     const card = button.closest('.calculator');
     if (button.dataset.action === 'clear') {
+      exportStatus.hidden = true;
       state.calculators[Number(card.dataset.index)] = core.normalizeSavedState(null).calculators[0];
       fill(card);
       update(card);
