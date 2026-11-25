@@ -8,7 +8,7 @@ test('one light-themed entry per calculator, with a common stylesheet and return
   const home = read('index.html');
   for (const page of pages) {
     assert.match(home, new RegExp('href="' + page + '"'));
-    assert.match(read(page), /href="suite\.css\?v=20261125"/);
+    assert.match(read(page), /href="suite\.css\?v=20261125-2"/);
     assert.match(read(page), /href="index\.html"/);
     assert.match(read(page), /<body class="tool /);
   }
