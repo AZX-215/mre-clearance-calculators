@@ -4,12 +4,14 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Feet & Inches Calculator</title>
-<link rel="stylesheet" href="feet-inches.css" />
+<link rel="stylesheet" href="feet-inches.css?v=20261125" />
+<link rel="stylesheet" href="suite.css?v=20261125">
 </head>
-<body data-count="2">
+<body class="tool feet" data-count="2">
 <main class="page">
+  <a class="back" href="index.html">← All calculators</a>
   <section class="topbar">
-    <h1>Feet & Inches Calculator</h1>
+    <div><h1>Feet &amp; Inches Calculator</h1><p class="page-intro">Independent measurement conversions and arithmetic.</p></div>
     <div class="page-controls">
       <div class="count-control">
         <label for="calcCount">Calculators shown</label>
@@ -28,10 +30,11 @@
     </div>
   </section>
 
+  <p id="migrationNotice" class="migration-notice" role="status" hidden></p>
   <section class="grid" id="calculatorGrid" aria-label="Feet and inches calculators"></section>
 </main>
 
-<script src="feet-inches-core.js"></script>
-<script src="feet-inches-app.js"></script>
+<script src="feet-inches-core.js?v=20261125"></script>
+<script src="feet-inches-app.js?v=20261125"></script>
 </body>
 </html>
