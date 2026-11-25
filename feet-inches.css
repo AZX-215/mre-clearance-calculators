@@ -156,22 +156,8 @@
     font-size: 13px;
     font-weight: 850;
   }
-  .source-row { margin-bottom: 9px; }
   .field-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .single-field { display: grid; grid-template-columns: 1fr; }
-  .linked-value {
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    padding: 8px 10px;
-    border: 1px solid var(--accent-border);
-    border-radius: 8px;
-    background: #f0f6fa;
-    color: #294f69;
-    font-size: 13px;
-    font-weight: 700;
-  }
-  .linked-value.error { color: var(--danger); border-color: #ddb8b4; background: #fff4f3; }
   .hidden { display: none !important; }
 
   .operation-box { padding: 0; border: 0; background: transparent; }

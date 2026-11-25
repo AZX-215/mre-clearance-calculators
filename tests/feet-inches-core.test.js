@@ -32,33 +32,15 @@ test('calculateOperation multiplies and divides by a decimal factor', () => {
   assert.throws(() => core.calculateOperation('divide', 150, 0), /divide by zero/i);
 });
 
-test('linked result uses decimal feet when it serves as a multiply or divide factor', () => {
-  assert.equal(core.resultInchesToFactor(362), 362 / 12);
-});
-
-test('wouldCreateCycle rejects direct and indirect calculator loops', () => {
-  const states = [
-    { sourceA: 'manual', sourceB: '2' },
-    { sourceA: 'manual', sourceB: '3' },
-    { sourceA: 'manual', sourceB: 'manual' },
-  ];
-
-  assert.equal(core.wouldCreateCycle(states, 3, 1), true);
-  assert.equal(core.wouldCreateCycle(states, 2, 1), true);
-  assert.equal(core.wouldCreateCycle(states, 1, 3), false);
-});
-
 test('serialize-friendly blank state is generated for eight calculators', () => {
   const states = core.createDefaultStates(8);
   assert.equal(states.length, 8);
   assert.deepEqual(states[0], {
     feetA: '',
     inchA: '',
-    sourceA: 'manual',
     feetB: '',
     inchB: '',
     factor: '',
-    sourceB: 'manual',
     operation: 'convert',
     locked: false,
     lockedValue: null,
@@ -67,28 +49,30 @@ test('serialize-friendly blank state is generated for eight calculators', () => 
   });
 });
 
-test('evaluateCalculator can add a linked calculator result', () => {
+test('calculators are independent even if legacy source fields are present', () => {
   const states = core.createDefaultStates(2);
-  states[0].feetA = '10';
-  states[0].inchA = '6.5';
-  states[0].operation = 'convert';
-  states[1].sourceA = '1';
-  states[1].operation = 'add';
-  states[1].feetB = '1';
-  states[1].inchB = '5.5';
-
-  assert.equal(core.evaluateCalculator(states, 2), 144);
+  Object.assign(states[0], { feetA: '10', inchA: '6.5' });
+  Object.assign(states[1], { feetA: '1', inchA: '5.5', operation: 'add', feetB: '2', sourceA: '1' });
+  assert.equal(core.evaluateCalculator(states, 2), 41.5);
+  states[0].feetA = '99';
+  assert.equal(core.evaluateCalculator(states, 2), 41.5);
 });
 
-test('evaluateCalculator uses a linked result as decimal-feet factor for multiply', () => {
-  const states = core.createDefaultStates(2);
-  states[0].feetA = '2';
-  states[0].inchA = '6';
-  states[1].feetA = '4';
-  states[1].operation = 'multiply';
-  states[1].sourceB = '1';
-
-  assert.equal(core.evaluateCalculator(states, 2), 120);
+test('legacy measurement and factor links become fixed values', () => {
+  const states = core.createDefaultStates(3);
+  Object.assign(states[0], { feetA: '2', inchA: '6' });
+  Object.assign(states[1], { sourceA: '1', operation: 'add', feetB: '1' });
+  Object.assign(states[2], { feetA: '4', operation: 'multiply', sourceB: '1' });
+  const migration = core.migrateLinkedInputs(states);
+  assert.equal(migration.converted, 2);
+  assert.equal(migration.cleared, 0);
+  assert.equal(core.evaluateCalculator(migration.calculators, 2), 42);
+  assert.equal(core.evaluateCalculator(migration.calculators, 3), 120);
+  assert.equal('sourceA' in migration.calculators[1], false);
+  assert.equal('sourceB' in migration.calculators[2], false);
+  migration.calculators[0].feetA = '9';
+  assert.equal(core.evaluateCalculator(migration.calculators, 2), 42);
+  assert.equal(core.evaluateCalculator(migration.calculators, 3), 120);
 });
 
 test('evaluateCalculator returns a locked snapshot even after inputs change', () => {
@@ -101,28 +85,23 @@ test('evaluateCalculator returns a locked snapshot even after inputs change', ()
   assert.equal(core.evaluateCalculator(states, 1), 120);
 });
 
-test('evaluateCalculator rejects persisted circular references', () => {
-  const states = core.createDefaultStates(2);
+test('legacy circular or unavailable links are flagged for manual re-entry', () => {
+  const states = core.createDefaultStates(3);
   states[0].sourceA = '2';
   states[1].sourceA = '1';
-
-  assert.throws(() => core.evaluateCalculator(states, 1), /circular/i);
+  states[2].sourceA = '8';
+  const migration = core.migrateLinkedInputs(states);
+  assert.equal(migration.cleared, 3);
+  for (let n = 1; n <= 3; n++) assert.throws(() => core.evaluateCalculator(migration.calculators, n), /decimal number/i);
 });
 
-test('wouldCreateCycle ignores an inactive B source when operation is convert', () => {
-  const states = core.createDefaultStates(2);
-  states[0].operation = 'convert';
-  states[0].sourceB = '2';
-
-  assert.equal(core.wouldCreateCycle(states, 2, 1), false);
-});
-
-test('wouldCreateCycle treats a locked result as a dependency break', () => {
-  const states = core.createDefaultStates(2);
-  states[0].operation = 'add';
-  states[0].sourceB = '2';
-  states[0].locked = true;
-  states[0].lockedValue = 120;
-
-  assert.equal(core.wouldCreateCycle(states, 2, 1), false);
+test('legacy locked and hidden operands preserve saved values', () => {
+  const states = core.createDefaultStates(3);
+  Object.assign(states[0], { feetA: '12', locked: true, lockedValue: 30 });
+  Object.assign(states[1], { sourceA: '1' });
+  Object.assign(states[2], { sourceB: '1', feetB: '7', operation: 'convert' });
+  const migration = core.migrateLinkedInputs(states);
+  assert.equal(core.evaluateCalculator(migration.calculators, 2), 30);
+  assert.equal(migration.calculators[2].feetB, '7');
+  assert.equal(core.evaluateCalculator(migration.calculators, 1), 30);
 });

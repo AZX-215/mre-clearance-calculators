@@ -58,35 +58,7 @@
     return totalInches / 12;
   }
 
-  function getReferences(state) {
-    if (!state) return [];
-    if (state.locked && Number.isFinite(state.lockedValue)) return [];
-    const refs = [state.sourceA];
-    if (state.operation !== 'convert') refs.push(state.sourceB);
-    return refs
-      .filter((value) => value && value !== 'manual')
-      .map(Number)
-      .filter(Number.isInteger);
-  }
-
-  function wouldCreateCycle(states, calculatorNumber, candidateSourceNumber) {
-    const target = Number(calculatorNumber);
-    const start = Number(candidateSourceNumber);
-    if (!Number.isInteger(target) || !Number.isInteger(start)) return false;
-    if (target === start) return true;
-
-    const visited = new Set();
-    function reachesTarget(calcNumber) {
-      if (calcNumber === target) return true;
-      if (visited.has(calcNumber)) return false;
-      visited.add(calcNumber);
-      const state = states[calcNumber - 1];
-      return getReferences(state).some(reachesTarget);
-    }
-    return reachesTarget(start);
-  }
-
-  function evaluateCalculator(states, calculatorNumber, visiting) {
+  function evaluateLegacyLink(states, calculatorNumber, visiting) {
     const calcNumber = Number(calculatorNumber);
     const state = states[calcNumber - 1];
     if (!state) throw new Error('Calculator source is unavailable.');
@@ -102,7 +74,7 @@
       if (!Number.isInteger(sourceNumber) || sourceNumber < 1 || sourceNumber > states.length) {
         throw new Error('Linked calculator source is unavailable.');
       }
-      return evaluateCalculator(states, sourceNumber, active);
+      return evaluateLegacyLink(states, sourceNumber, active);
     }
 
     try {
@@ -127,15 +99,59 @@
     }
   }
 
+  // Legacy links are evaluated only while migrating old saved inputs.
+  function migrateLinkedInputs(rawStates) {
+    let converted = 0, cleared = 0;
+    const calculators = rawStates.map((raw, i) => {
+      if (!raw || typeof raw !== 'object') return raw;
+      const next = { ...raw };
+      for (const which of ['A', 'B']) {
+        const source = raw['source' + which];
+        if (source && source !== 'manual') {
+          const isFactor = which === 'B' && ['multiply', 'divide'].includes(raw.operation);
+          // A hidden B operand has no active source value; do not replace its saved manual values.
+          if (which === 'B' && raw.operation === 'convert') continue;
+          try {
+            const value = evaluateLegacyLink(rawStates, Number(source));
+            if (!Number.isFinite(value)) throw new Error('Invalid linked result');
+            if (isFactor) next.factor = String(value / 12);
+            else { next['feet' + which] = ''; next['inch' + which] = String(value); }
+            converted += 1;
+          } catch (_) {
+            if (isFactor) next.factor = '';
+            else { next['feet' + which] = ''; next['inch' + which] = ''; }
+            // Block a misleading zero result until the missing input is reviewed.
+            if (isFactor) next.factor = 'Re-enter value';
+            else next['inch' + which] = 'Re-enter value';
+            cleared += 1;
+          }
+        }
+      }
+      delete next.sourceA;
+      delete next.sourceB;
+      return next;
+    });
+    return { calculators, converted, cleared };
+  }
+
+  function evaluateCalculator(states, calculatorNumber) {
+    const state = states[Number(calculatorNumber) - 1];
+    if (!state) throw new Error('Calculator is unavailable.');
+    if (state.locked && Number.isFinite(state.lockedValue)) return state.lockedValue;
+    const a = measurementToInches(state.feetA, state.inchA);
+    let second = 0;
+    if (state.operation === 'add' || state.operation === 'subtract') second = measurementToInches(state.feetB, state.inchB);
+    else if (state.operation === 'multiply' || state.operation === 'divide') second = parseDecimal(state.factor);
+    return calculateOperation(state.operation, a, second);
+  }
+
   function createDefaultState() {
     return {
       feetA: '',
       inchA: '',
-      sourceA: 'manual',
       feetB: '',
       inchB: '',
       factor: '',
-      sourceB: 'manual',
       operation: 'convert',
       locked: false,
       lockedValue: null,
@@ -154,8 +170,7 @@
     trimNumber,
     formatFeetInches,
     calculateOperation,
-    resultInchesToFactor,
-    wouldCreateCycle,
+    migrateLinkedInputs,
     evaluateCalculator,
     createDefaultStates,
   };

@@ -1,167 +1,22 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MRE Clearance Calculators</title>
-  <style>
-    :root {
-      --bg: #eef1f5;
-      --panel: #ffffff;
-      --text: #1f2937;
-      --muted: #5b6472;
-      --border: rgba(100,116,139,.28);
-      --shadow: 0 14px 32px rgba(15,23,42,.12);
-      --radius: 20px;
-    }
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      font-family: Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(37,99,235,.10), transparent 30rem),
-        radial-gradient(circle at top right, rgba(47,133,90,.08), transparent 28rem),
-        linear-gradient(180deg, #f8fafc 0%, #e5e7eb 100%);
-      color: var(--text);
-    }
-    .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 20px; }
-    header { margin-bottom: 26px; }
-    h1 { margin: 0 0 8px; font-size: clamp(30px, 5vw, 48px); letter-spacing: -.4px; }
-    .sub { color: var(--muted); font-size: 16px; line-height: 1.5; max-width: 820px; }
-    h2 { margin: 28px 0 12px; font-size: 20px; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-    .grid.single { grid-template-columns: minmax(280px, 1fr); max-width: 720px; }
-    @media (max-width: 800px) { .grid, .grid.single { grid-template-columns: 1fr; } }
-    .card {
-      display: block;
-      text-decoration: none;
-      color: inherit;
-      background: rgba(255,255,255,.92);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 20px;
-      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-    }
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 18px 42px rgba(15,23,42,.16);
-      border-color: rgba(37,99,235,.35);
-    }
-    .swatch {
-      height: 86px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      margin-bottom: 16px;
-      overflow: hidden;
-      position: relative;
-    }
-    .swatch:after {
-      content: "";
-      position: absolute;
-      left: 16px;
-      right: 16px;
-      top: 18px;
-      height: 16px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.58);
-      box-shadow: 0 26px 0 rgba(255,255,255,.28);
-    }
-    .blue-swatch { background: linear-gradient(135deg, #0b1020, #121a2d 55%, #0ea5e9); }
-    .grey-swatch { background: linear-gradient(135deg, #17191d, #2c3038 55%, #8fc1de); }
-    .light-swatch { background: linear-gradient(135deg, #f8fafc, #e5e7eb 55%, #2563eb); }
-    .ugi-swatch { background: linear-gradient(135deg, #202226, #30343a 55%, #4e805b); }
-    .feet-swatch { background: linear-gradient(135deg, #f7f8fa, #dce3e8 55%, #6d96b1); }
-    .theme-title { font-size: 23px; font-weight: 800; margin-bottom: 6px; }
-    .desc { color: var(--muted); line-height: 1.42; min-height: 42px; }
-    .open {
-      margin-top: 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border-radius: 999px;
-      padding: 9px 12px;
-      border: 1px solid var(--border);
-      background: #f8fafc;
-      font-weight: 700;
-      font-size: 14px;
-    }
-    .note {
-      margin-top: 26px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-      background: rgba(255,255,255,.70);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px 16px;
-    }
-    code { background: rgba(148,163,184,.20); padding: 2px 5px; border-radius: 6px; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>MRE Clearance Calculators</title>
+<link rel="stylesheet" href="suite.css?v=20261125">
 </head>
-<body>
-  <main class="wrap">
-    <header>
-      <h1>MRE Clearance Calculators</h1>
-      <div class="sub">Browser-based utility design helpers that can be used online through GitHub Pages or downloaded and opened locally without an internet connection.</div>
-    </header>
-
-    <h2>Delta Clearance Calculator</h2>
-    <section class="grid" aria-label="Delta calculator themes">
-      <a class="card" href="blue.html">
-        <div class="swatch blue-swatch"></div>
-        <div class="theme-title">Blue Theme</div>
-        <div class="desc">Dark navy layout with blue and green accents.</div>
-        <div class="open">Open Delta Calculator →</div>
-      </a>
-      <a class="card" href="grey.html">
-        <div class="swatch grey-swatch"></div>
-        <div class="theme-title">Grey Theme</div>
-        <div class="desc">Neutral dark-gray layout with softer contrast.</div>
-        <div class="open">Open Delta Calculator →</div>
-      </a>
-      <a class="card" href="light.html">
-        <div class="swatch light-swatch"></div>
-        <div class="theme-title">Light Theme</div>
-        <div class="desc">Light gray layout for brighter environments.</div>
-        <div class="open">Open Delta Calculator →</div>
-      </a>
-    </section>
-
-    <h2>UGI Sag & Pole Depth Calculator</h2>
-    <section class="grid single" aria-label="UGI sag and pole depth calculator">
-      <a class="card" href="ugi-resag.html">
-        <div class="swatch ugi-swatch"></div>
-        <div class="theme-title">UGI Sag & Pole Depth</div>
-        <div class="desc">Calculate resag height from the UGI sag chart and pole height above ground from the pole-depth chart.</div>
-        <div class="open">Open UGI Calculator →</div>
-      </a>
-    </section>
-
-    <h2>Mon Power Proposed Midspan Calculator</h2>
-    <section class="grid single" aria-label="Mon Power proposed midspan calculator">
-      <a class="card" href="mon-power-midspan.html">
-        <div class="swatch light-swatch"></div>
-        <div class="theme-title">Mon Power Proposed Midspan</div>
-        <div class="desc">Calculate proposed comm midspan heights with up to 100 calculators and export completed calculations to Markdown.</div>
-        <div class="open">Open Mon Power Calculator →</div>
-      </a>
-    </section>
-
-    <h2>Feet & Inches Calculator</h2>
-    <section class="grid single" aria-label="Feet and inches calculator">
-      <a class="card" href="feet-inches.html">
-        <div class="swatch feet-swatch"></div>
-        <div class="theme-title">Feet & Inches</div>
-        <div class="desc">Use up to 8 calculators with decimal feet/inches math, linked results, result locking, and a responsive layout.</div>
-        <div class="open">Open Feet & Inches Calculator →</div>
-      </a>
-    </section>
-
-    <div class="note">
-      GitHub Pages opens this landing page from <code>index.html</code>. All calculators can also be downloaded with the repository files for offline use.
-    </div>
-  </main>
+<body class="home">
+<main class="wrap">
+<header class="masthead"><div class="eyebrow">Utility design toolkit</div><h1>MRE Clearance Calculators</h1><p>Practical field engineering calculators for clearances, conductor sag, pole setting and measurement math. Select a tool to get started.</p></header>
+<section class="tool-grid" aria-label="Calculators">
+<a class="tool-card delta" href="light.html"><div class="swatch" aria-hidden="true"></div><span class="card-category">Avangrid-inspired</span><h2>Delta Clearance</h2><p>Calculate conductor clearance and ruling spans; compare up to three independent calculators.</p><span class="open">Open calculator →</span></a>
+<a class="tool-card ugi" href="ugi-resag.html"><div class="swatch" aria-hidden="true"></div><span class="card-category">UGI</span><h2>UGI Sag &amp; Pole Depth</h2><p>Review conductor resag estimates and pole-setting depths with built-in reference charts.</p><span class="open">Open calculator →</span></a>
+<a class="tool-card mon" href="mon-power-midspan.html"><div class="swatch" aria-hidden="true"></div><span class="card-category">Mon Power</span><h2>Mon Power Proposed Midspan</h2><p>Calculate proposed communication midspan heights and export completed calculations.</p><span class="open">Open calculator →</span></a>
+<a class="tool-card feet" href="feet-inches.html"><div class="swatch" aria-hidden="true"></div><span class="card-category">Measurement utilities</span><h2>Feet &amp; Inches</h2><p>Convert and perform arithmetic on measurements with up to eight independent calculators.</p><span class="open">Open calculator →</span></a>
+</section>
+<footer>Runs locally in your browser. All tools work offline when the repository files are downloaded. <a href="https://github.com/AZX-215/mre-clearance-calculators">Repository &amp; documentation</a>.</footer>
+</main>
 </body>
 </html>
