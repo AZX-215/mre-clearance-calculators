@@ -9,15 +9,6 @@
 
   if (!core) throw new Error('Calculator core failed to load.');
 
-  function sourceOptions(n) {
-    let options = '<option value="manual">Manual entry</option>';
-    for (let i = 1; i <= MAX_CALCULATORS; i += 1) {
-      if (i === n) continue;
-      options += `<option value="${i}">Calculator ${i} result</option>`;
-    }
-    return options;
-  }
-
   function calcMarkup(n) {
     return `
       <article class="calculator" data-calc="${n}" id="calculator${n}">
@@ -28,10 +19,6 @@
         <div class="content">
           <section class="step">
             <h3 class="step-title">Measurement A</h3>
-            <div class="source-row">
-              <label for="sourceA${n}">Source</label>
-              <select id="sourceA${n}">${sourceOptions(n)}</select>
-            </div>
             <div class="field-pair" id="manualA${n}">
               <div>
                 <label for="feetA${n}">Feet</label>
@@ -42,7 +29,6 @@
                 <input id="inchA${n}" inputmode="decimal" placeholder="0" autocomplete="off" />
               </div>
             </div>
-            <div class="linked-value hidden" id="linkedA${n}"></div>
           </section>
 
           <section class="operation-box">
@@ -58,10 +44,6 @@
 
           <section class="step" id="operandB${n}">
             <h3 class="step-title" id="operandBTitle${n}">Measurement B</h3>
-            <div class="source-row">
-              <label for="sourceB${n}">Source</label>
-              <select id="sourceB${n}">${sourceOptions(n)}</select>
-            </div>
             <div class="field-pair" id="manualB${n}">
               <div>
                 <label for="feetB${n}">Feet</label>
@@ -78,7 +60,6 @@
                 <input id="factor${n}" inputmode="decimal" placeholder="Example: 1.5" autocomplete="off" />
               </div>
             </div>
-            <div class="linked-value hidden" id="linkedB${n}"></div>
           </section>
 
           <div class="buttons">
@@ -109,10 +90,6 @@
     ['feetA', 'inchA', 'feetB', 'inchB', 'factor'].forEach((key) => {
       if (typeof raw[key] === 'string' || typeof raw[key] === 'number') next[key] = String(raw[key]);
     });
-    ['sourceA', 'sourceB'].forEach((key) => {
-      const value = String(raw[key] ?? 'manual');
-      next[key] = value === 'manual' || (/^[1-8]$/.test(value)) ? value : 'manual';
-    });
     if (operations.has(raw.operation)) next.operation = raw.operation;
     next.locked = raw.locked === true;
     next.lockedValue = Number.isFinite(raw.lockedValue) ? raw.lockedValue : null;
@@ -123,23 +100,31 @@
   function loadSaved() {
     const defaults = core.createDefaultStates(MAX_CALCULATORS);
     let count = 2;
+    let migration = null;
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
       if (saved && typeof saved === 'object') {
         count = Math.max(1, Math.min(MAX_CALCULATORS, Number(saved.count) || 2));
         if (Array.isArray(saved.calculators)) {
-          for (let i = 0; i < MAX_CALCULATORS; i += 1) defaults[i] = normalizeState(saved.calculators[i], defaults[i]);
+          migration = core.migrateLinkedInputs(saved.calculators);
+          for (let i = 0; i < MAX_CALCULATORS; i += 1) defaults[i] = normalizeState(migration.calculators[i], defaults[i]);
         }
       }
     } catch (error) {
       count = 2;
     }
-    return { count, states: defaults };
+    return { count, states: defaults, migration };
   }
 
   const saved = loadSaved();
   let calculatorCount = saved.count;
   let states = saved.states;
+  if (saved.migration?.converted || saved.migration?.cleared) {
+    const notice = $('migrationNotice');
+    const { converted, cleared } = saved.migration;
+    notice.textContent = `Calculator linking has been removed. ${converted} linked inputs converted to fixed manual values. ${cleared ? `${cleared} unavailable linked inputs were cleared; re-enter them before using those results. ` : ''}Review the manual values before continuing.`;
+    notice.hidden = false;
+  }
 
   function persist() {
     try {
@@ -157,28 +142,6 @@
     persist();
   }
 
-  function refreshSourceOptions() {
-    for (let n = 1; n <= MAX_CALCULATORS; n += 1) {
-      ['A', 'B'].forEach((which) => {
-        const select = $('source' + which + n);
-        const selected = states[n - 1]['source' + which];
-        Array.from(select.options).forEach((option) => {
-          if (option.value === 'manual') {
-            option.disabled = false;
-            return;
-          }
-          const candidate = Number(option.value);
-          option.disabled = candidate === n || core.wouldCreateCycle(states, n, candidate);
-        });
-        select.value = selected;
-        if (select.value !== selected) {
-          states[n - 1]['source' + which] = 'manual';
-          select.value = 'manual';
-        }
-      });
-    }
-  }
-
   function syncInputsFromState(n) {
     const state = states[n - 1];
     $('feetA' + n).value = state.feetA;
@@ -186,19 +149,7 @@
     $('feetB' + n).value = state.feetB;
     $('inchB' + n).value = state.inchB;
     $('factor' + n).value = state.factor;
-    $('sourceA' + n).value = state.sourceA;
-    $('sourceB' + n).value = state.sourceB;
     $('op' + n).value = state.operation;
-  }
-
-  function getLinkedResult(source) {
-    if (!source || source === 'manual') return null;
-    const sourceNumber = Number(source);
-    try {
-      return { number: sourceNumber, value: core.evaluateCalculator(states, sourceNumber), error: '' };
-    } catch (error) {
-      return { number: sourceNumber, value: null, error: error.message };
-    }
   }
 
   function updateCardLayout(n) {
@@ -210,34 +161,8 @@
     $('operandB' + n).classList.toggle('hidden', !hasB);
     $('operandBTitle' + n).textContent = isFactorOperation ? 'Factor' : 'Measurement B';
 
-    const linkedA = state.sourceA !== 'manual';
-    $('manualA' + n).classList.toggle('hidden', linkedA);
-    $('linkedA' + n).classList.toggle('hidden', !linkedA);
-
-    const linkedB = state.sourceB !== 'manual';
-    $('manualB' + n).classList.toggle('hidden', !isMeasureOperation || linkedB);
-    $('factorWrap' + n).classList.toggle('hidden', !isFactorOperation || linkedB);
-    $('linkedB' + n).classList.toggle('hidden', !hasB || !linkedB);
-
-    if (linkedA) {
-      const linked = getLinkedResult(state.sourceA);
-      $('linkedA' + n).classList.toggle('error', Boolean(linked.error));
-      $('linkedA' + n).textContent = linked.error
-        ? `Calculator ${linked.number}: ${linked.error}`
-        : `Calculator ${linked.number}: ${core.formatFeetInches(linked.value)}`;
-    }
-
-    if (hasB && linkedB) {
-      const linked = getLinkedResult(state.sourceB);
-      $('linkedB' + n).classList.toggle('error', Boolean(linked.error));
-      if (linked.error) {
-        $('linkedB' + n).textContent = `Calculator ${linked.number}: ${linked.error}`;
-      } else if (isFactorOperation) {
-        $('linkedB' + n).textContent = `Calculator ${linked.number}: ${core.trimNumber(core.resultInchesToFactor(linked.value))}`;
-      } else {
-        $('linkedB' + n).textContent = `Calculator ${linked.number}: ${core.formatFeetInches(linked.value)}`;
-      }
-    }
+    $('manualB' + n).classList.toggle('hidden', !isMeasureOperation);
+    $('factorWrap' + n).classList.toggle('hidden', !isFactorOperation);
 
     $('calculator' + n).classList.toggle('locked', state.locked);
     $('lock' + n).classList.toggle('is-locked', state.locked);
@@ -280,7 +205,6 @@
         state.error = error.message;
       }
     }
-    refreshSourceOptions();
     for (let n = 1; n <= MAX_CALCULATORS; n += 1) {
       updateCardLayout(n);
       renderResult(n);
@@ -289,18 +213,6 @@
   }
 
   function updateTextField(n, key, value) {
-    states[n - 1][key] = value;
-    recalculateAll();
-  }
-
-  function updateSource(n, key, value) {
-    const previous = states[n - 1][key];
-    if (value !== 'manual' && core.wouldCreateCycle(states, n, Number(value))) {
-      $('source' + key.slice(-1) + n).value = previous;
-      states[n - 1].error = 'That link would create a circular calculator reference.';
-      renderResult(n);
-      return;
-    }
     states[n - 1][key] = value;
     recalculateAll();
   }
@@ -337,8 +249,6 @@
     ['feetA', 'inchA', 'feetB', 'inchB', 'factor'].forEach((key) => {
       $(key + n).addEventListener('input', (event) => updateTextField(n, key, event.target.value));
     });
-    $('sourceA' + n).addEventListener('change', (event) => updateSource(n, 'sourceA', event.target.value));
-    $('sourceB' + n).addEventListener('change', (event) => updateSource(n, 'sourceB', event.target.value));
     $('op' + n).addEventListener('change', (event) => {
       states[n - 1].operation = event.target.value;
       recalculateAll();
