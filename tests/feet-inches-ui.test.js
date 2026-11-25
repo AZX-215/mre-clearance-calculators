@@ -17,9 +17,9 @@ test('page offers up to eight calculators and a clear-all action', () => {
   assert.match(app, /MAX_CALCULATORS\s*=\s*8/);
 });
 
-test('calculator cards use vertical manual-or-linked inputs and locking', () => {
-  assert.match(app, /sourceA\$\{n\}/);
-  assert.match(app, /sourceB\$\{n\}/);
+test('calculator cards use manual-only inputs and locking', () => {
+  assert.doesNotMatch(app, /sourceA\$\{n\}/);
+  assert.doesNotMatch(app, /sourceB\$\{n\}/);
   assert.match(app, /lock\$\{n\}/);
   assert.doesNotMatch(allUiText, /Independent feet and inches calculation/i);
 });
@@ -32,13 +32,13 @@ test('rounding controls are removed and decimal entry is emphasized', () => {
 });
 
 test('page loads separated calculator assets and responsive auto-fit cards', () => {
-  assert.match(html, /href="feet-inches\.css"/);
-  assert.match(html, /<script src="feet-inches-core\.js"><\/script>/);
-  assert.match(html, /<script src="feet-inches-app\.js"><\/script>/);
+  assert.match(html, /href="feet-inches\.css\?v=20261125"/);
+  assert.match(html, /<script src="feet-inches-core\.js\?v=20261125"><\/script>/);
+  assert.match(html, /<script src="feet-inches-app\.js\?v=20261125"><\/script>/);
   assert.match(css, /auto-fit/);
 });
 
-test('browser state persistence includes calculator values, sources and locks', () => {
+test('browser state persistence includes calculator values and locks', () => {
   assert.match(app, /feet-inches-calculator-state-v2/);
   assert.match(app, /localStorage\.setItem/);
   assert.match(app, /lockedValue/);
